@@ -1,0 +1,86 @@
+{
+  "type": "FeatureCollection",
+  "metadata": {
+    "generated": 1785441600000,
+    "url": "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_day.geojson",
+    "title": "Quake Scope deterministic USGS fixture",
+    "status": 200,
+    "api": "1.14.1",
+    "count": 3
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "mag": 3.2,
+        "place": "12 km NW of The Geysers, CA",
+        "time": 1785438000000,
+        "updated": 1785438300000,
+        "url": "https://earthquake.usgs.gov/earthquakes/eventpage/qs-demo-001",
+        "detail": "https://earthquake.usgs.gov/earthquakes/feed/v1.0/detail/qs-demo-001.geojson",
+        "alert": "green",
+        "status": "reviewed",
+        "tsunami": 0,
+        "sig": 158,
+        "net": "nc",
+        "code": "qs-demo-001",
+        "type": "earthquake",
+        "title": "M 3.2 - 12 km NW of The Geysers, CA"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-122.846, 38.842, 2.7]
+      },
+      "id": "qs-demo-001"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mag": 5.1,
+        "place": "90 km SE of Sand Point, Alaska",
+        "time": 1785434400000,
+        "updated": 1785436200000,
+        "url": "https://earthquake.usgs.gov/earthquakes/eventpage/qs-demo-002",
+        "detail": "https://earthquake.usgs.gov/earthquakes/feed/v1.0/detail/qs-demo-002.geojson",
+        "alert": null,
+        "status": "automatic",
+        "tsunami": 1,
+        "sig": 400,
+        "net": "us",
+        "code": "qs-demo-002",
+        "type": "earthquake",
+        "title": "M 5.1 - 90 km SE of Sand Point, Alaska"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-159.241, 54.734, 34.0]
+      },
+      "id": "qs-demo-002"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mag": null,
+        "place": null,
+        "time": 1785430800000,
+        "updated": 1785430860000,
+        "url": "https://earthquake.usgs.gov/earthquakes/eventpage/qs-demo-003",
+        "detail": "https://earthquake.usgs.gov/earthquakes/feed/v1.0/detail/qs-demo-003.geojson",
+        "alert": null,
+        "status": "automatic",
+        "tsunami": 0,
+        "sig": 0,
+        "net": "ak",
+        "code": "qs-demo-003",
+        "type": "earthquake",
+        "title": "M ? - Alaska"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-149.901, 61.218, 18.5]
+      },
+      "id": "qs-demo-003"
+    }
+  ],
+  "bbox": [-159.241, 38.842, 2.7, -122.846, 61.218, 34.0]
+}

@@ -1,0 +1,3 @@
+quakescope:
+  fixture:
+    location: classpath:fixtures/usgs/sample-feed.geojson
