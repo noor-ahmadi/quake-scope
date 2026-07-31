@@ -82,10 +82,19 @@ Returns earthquakes newest-first by default. It accepts Spring-style `page`,
 }
 ```
 
+### `GET /api/v1/earthquakes/{usgsId}`
+
+Returns one earthquake by its stable USGS event ID. Missing events return an
+RFC 9457 problem detail response with HTTP `404`.
+
+```bash
+curl "http://localhost:8080/api/v1/earthquakes/qs-demo-001"
+```
+
 ## Next
 
-The next backend milestones add live USGS catch-up ingestion, filters, event
-details, ingestion-run metrics, analytics, retry handling, and retention.
+The next backend milestones add live USGS catch-up ingestion, filters,
+ingestion-run metrics, analytics, retry handling, and retention.
 
 ## License
 

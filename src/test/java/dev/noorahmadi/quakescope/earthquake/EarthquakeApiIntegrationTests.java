@@ -8,10 +8,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -66,5 +68,31 @@ class EarthquakeApiIntegrationTests {
 
         assertThat(repeated).isEqualTo(new IngestionResult(3, 0, 0, 3));
         assertThat(repository.count()).isEqualTo(3);
+    }
+
+    @Test
+    void returnsEarthquakeDetailsByUsgsId() throws Exception {
+        ingestionService.ingest(FIXTURE);
+
+        mockMvc.perform(get("/api/v1/earthquakes/qs-demo-002"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.usgsId").value("qs-demo-002"))
+                .andExpect(jsonPath("$.magnitude").value(5.1))
+                .andExpect(jsonPath("$.place").value("90 km SE of Sand Point, Alaska"))
+                .andExpect(jsonPath("$.tsunami").value(true))
+                .andExpect(jsonPath("$.status").value("automatic"));
+    }
+
+    @Test
+    void returnsProblemDetailWhenEarthquakeDoesNotExist() throws Exception {
+        mockMvc.perform(get("/api/v1/earthquakes/missing-event"))
+                .andExpect(status().isNotFound())
+                .andExpect(content().contentType(MediaType.APPLICATION_PROBLEM_JSON))
+                .andExpect(jsonPath("$.title").value("Not Found"))
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.detail")
+                        .value("Earthquake 'missing-event' was not found"))
+                .andExpect(jsonPath("$.instance")
+                        .value("/api/v1/earthquakes/missing-event"));
     }
 }
