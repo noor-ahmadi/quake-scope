@@ -56,7 +56,12 @@ HTTP response and page metadata.
 ### `GET /api/v1/earthquakes`
 
 Returns earthquakes newest-first by default. It accepts Spring-style `page`,
-`size`, and `sort` query parameters; page size is capped at 100.
+`size`, and `sort` query parameters, plus an optional inclusive `minMagnitude`
+filter; page size is capped at 100.
+
+```bash
+curl "http://localhost:8080/api/v1/earthquakes?minMagnitude=4.0"
+```
 
 ```json
 {

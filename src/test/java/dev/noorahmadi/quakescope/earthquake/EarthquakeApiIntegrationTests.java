@@ -71,6 +71,19 @@ class EarthquakeApiIntegrationTests {
     }
 
     @Test
+    void filtersEarthquakesByMinimumMagnitude() throws Exception {
+        ingestionService.ingest(FIXTURE);
+
+        mockMvc.perform(get("/api/v1/earthquakes")
+                        .queryParam("minMagnitude", "4.0"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content.length()").value(1))
+                .andExpect(jsonPath("$.content[0].usgsId").value("qs-demo-002"))
+                .andExpect(jsonPath("$.content[0].magnitude").value(5.1))
+                .andExpect(jsonPath("$.page.totalElements").value(1));
+    }
+
+    @Test
     void returnsEarthquakeDetailsByUsgsId() throws Exception {
         ingestionService.ingest(FIXTURE);
 

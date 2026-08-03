@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -26,8 +27,13 @@ public class EarthquakeController {
                     size = 20,
                     sort = "occurredAt",
                     direction = Sort.Direction.DESC)
-            Pageable pageable) {
-        return EarthquakePageResponse.from(repository.findAll(pageable));
+            Pageable pageable,
+            @RequestParam(required = false) Double minMagnitude) {
+        if (minMagnitude == null) {
+            return EarthquakePageResponse.from(repository.findAll(pageable));
+        }
+        return EarthquakePageResponse.from(
+                repository.findByMagnitudeGreaterThanEqual(minMagnitude, pageable));
     }
 
     @GetMapping("/{usgsId}")
