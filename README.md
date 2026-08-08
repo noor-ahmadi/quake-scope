@@ -117,6 +117,17 @@ RFC 9457 problem detail response with HTTP `404`.
 curl "http://localhost:8080/api/v1/earthquakes/qs-demo-001"
 ```
 
+### `GET /api/v1/earthquakes/summary`
+
+Computes dashboard-ready aggregates in PostgreSQL: total events, events with a
+magnitude, average and maximum magnitude, tsunami count, average depth, time
+coverage, and the strongest event. It accepts every filter supported by the
+earthquake list.
+
+```bash
+curl "http://localhost:8080/api/v1/earthquakes/summary?occurredAfter=2026-07-30T00:00:00Z"
+```
+
 ### `GET /api/v1/ingestion-runs`
 
 Returns scheduled ingestion attempts newest-first, including their outcome,
@@ -130,8 +141,8 @@ curl "http://localhost:8080/api/v1/ingestion-runs?size=10"
 
 ## Next
 
-The next backend milestones add historical USGS catch-up ingestion, richer
-filters, analytics, and retention.
+The next backend milestones add historical USGS catch-up ingestion and data
+retention.
 
 ## License
 

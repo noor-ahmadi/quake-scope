@@ -129,6 +129,53 @@ class EarthquakeApiIntegrationTests {
     }
 
     @Test
+    void summarizesMatchingEarthquakesInTheDatabase() throws Exception {
+        ingestionService.ingest(FIXTURE);
+
+        mockMvc.perform(get("/api/v1/earthquakes/summary"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.totalEvents").value(3))
+                .andExpect(jsonPath("$.eventsWithMagnitude").value(2))
+                .andExpect(jsonPath("$.averageMagnitude").value(4.15))
+                .andExpect(jsonPath("$.maximumMagnitude").value(5.1))
+                .andExpect(jsonPath("$.tsunamiEvents").value(1))
+                .andExpect(jsonPath("$.averageDepthKm").value(18.4))
+                .andExpect(jsonPath("$.earliestOccurredAt")
+                        .value("2026-07-30T17:00:00Z"))
+                .andExpect(jsonPath("$.latestOccurredAt")
+                        .value("2026-07-30T19:00:00Z"))
+                .andExpect(jsonPath("$.strongestEarthquake.usgsId")
+                        .value("qs-demo-002"))
+                .andExpect(jsonPath("$.strongestEarthquake.magnitude").value(5.1));
+    }
+
+    @Test
+    void appliesFiltersToEarthquakeSummary() throws Exception {
+        ingestionService.ingest(FIXTURE);
+
+        mockMvc.perform(get("/api/v1/earthquakes/summary")
+                        .queryParam("maxMagnitude", "4.0")
+                        .queryParam("status", "reviewed"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.totalEvents").value(1))
+                .andExpect(jsonPath("$.averageMagnitude").value(3.2))
+                .andExpect(jsonPath("$.tsunamiEvents").value(0))
+                .andExpect(jsonPath("$.strongestEarthquake.usgsId")
+                        .value("qs-demo-001"));
+    }
+
+    @Test
+    void returnsEmptySummaryWhenNoEarthquakesMatch() throws Exception {
+        mockMvc.perform(get("/api/v1/earthquakes/summary"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.totalEvents").value(0))
+                .andExpect(jsonPath("$.eventsWithMagnitude").value(0))
+                .andExpect(jsonPath("$.tsunamiEvents").value(0))
+                .andExpect(jsonPath("$.averageMagnitude").doesNotExist())
+                .andExpect(jsonPath("$.strongestEarthquake").doesNotExist());
+    }
+
+    @Test
     void returnsEarthquakeDetailsByUsgsId() throws Exception {
         ingestionService.ingest(FIXTURE);
 
