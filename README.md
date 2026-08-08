@@ -109,10 +109,21 @@ RFC 9457 problem detail response with HTTP `404`.
 curl "http://localhost:8080/api/v1/earthquakes/qs-demo-001"
 ```
 
+### `GET /api/v1/ingestion-runs`
+
+Returns scheduled ingestion attempts newest-first, including their outcome,
+event counts, timestamps, and a bounded failure summary when an attempt fails.
+The endpoint accepts the same `page`, `size`, and `sort` parameters as the
+earthquake list.
+
+```bash
+curl "http://localhost:8080/api/v1/ingestion-runs?size=10"
+```
+
 ## Next
 
-The next backend milestones add live USGS catch-up ingestion, filters,
-ingestion-run metrics, analytics, retry handling, and retention.
+The next backend milestones add historical USGS catch-up ingestion, richer
+filters, analytics, and retention.
 
 ## License
 

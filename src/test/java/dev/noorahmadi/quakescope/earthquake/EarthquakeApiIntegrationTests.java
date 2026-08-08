@@ -1,5 +1,7 @@
 package dev.noorahmadi.quakescope.earthquake;
 
+import java.time.Instant;
+
 import dev.noorahmadi.quakescope.TestcontainersConfiguration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,11 +34,18 @@ class EarthquakeApiIntegrationTests {
     private EarthquakeRepository repository;
 
     @Autowired
+    private IngestionRunRepository runRepository;
+
+    @Autowired
+    private IngestionRunRecorder runRecorder;
+
+    @Autowired
     private MockMvc mockMvc;
 
     @BeforeEach
     void resetDatabase() {
         repository.deleteAll();
+        runRepository.deleteAll();
     }
 
     @Test
@@ -107,5 +116,33 @@ class EarthquakeApiIntegrationTests {
                         .value("Earthquake 'missing-event' was not found"))
                 .andExpect(jsonPath("$.instance")
                         .value("/api/v1/earthquakes/missing-event"));
+    }
+
+    @Test
+    void returnsNewestIngestionRunsWithOutcomes() throws Exception {
+        long successfulRun = runRecorder.start(Instant.parse("2026-08-08T19:58:00Z"));
+        runRecorder.succeed(
+                successfulRun,
+                new IngestionResult(3, 2, 1, 0),
+                Instant.parse("2026-08-08T19:58:02Z"));
+        long failedRun = runRecorder.start(Instant.parse("2026-08-08T19:59:00Z"));
+        runRecorder.fail(
+                failedRun,
+                new IllegalStateException("feed was unavailable"),
+                Instant.parse("2026-08-08T19:59:01Z"));
+
+        mockMvc.perform(get("/api/v1/ingestion-runs"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content.length()").value(2))
+                .andExpect(jsonPath("$.content[0].id").value(failedRun))
+                .andExpect(jsonPath("$.content[0].status").value("FAILED"))
+                .andExpect(jsonPath("$.content[0].errorMessage")
+                        .value("IllegalStateException: feed was unavailable"))
+                .andExpect(jsonPath("$.content[1].id").value(successfulRun))
+                .andExpect(jsonPath("$.content[1].status").value("SUCCEEDED"))
+                .andExpect(jsonPath("$.content[1].processed").value(3))
+                .andExpect(jsonPath("$.content[1].inserted").value(2))
+                .andExpect(jsonPath("$.content[1].updated").value(1))
+                .andExpect(jsonPath("$.page.totalElements").value(2));
     }
 }
