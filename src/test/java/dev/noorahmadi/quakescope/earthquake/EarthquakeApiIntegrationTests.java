@@ -93,6 +93,42 @@ class EarthquakeApiIntegrationTests {
     }
 
     @Test
+    void combinesTimeLocationAndEventFilters() throws Exception {
+        ingestionService.ingest(FIXTURE);
+
+        mockMvc.perform(get("/api/v1/earthquakes")
+                        .queryParam("minMagnitude", "3.0")
+                        .queryParam("maxMagnitude", "4.0")
+                        .queryParam("occurredAfter", "2026-07-30T18:30:00Z")
+                        .queryParam("occurredBefore", "2026-07-30T19:00:00Z")
+                        .queryParam("tsunami", "false")
+                        .queryParam("status", "REVIEWED")
+                        .queryParam("alert", "Green")
+                        .queryParam("placeContains", "geysers")
+                        .queryParam("minLongitude", "-130")
+                        .queryParam("maxLongitude", "-120")
+                        .queryParam("minLatitude", "30")
+                        .queryParam("maxLatitude", "45"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content.length()").value(1))
+                .andExpect(jsonPath("$.content[0].usgsId").value("qs-demo-001"))
+                .andExpect(jsonPath("$.page.totalElements").value(1));
+    }
+
+    @Test
+    void returnsProblemDetailForInvalidFilterRange() throws Exception {
+        mockMvc.perform(get("/api/v1/earthquakes")
+                        .queryParam("minLatitude", "45")
+                        .queryParam("maxLatitude", "30"))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType(MediaType.APPLICATION_PROBLEM_JSON))
+                .andExpect(jsonPath("$.title").value("Bad Request"))
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.detail")
+                        .value("minLatitude must be less than or equal to maxLatitude"));
+    }
+
+    @Test
     void returnsEarthquakeDetailsByUsgsId() throws Exception {
         ingestionService.ingest(FIXTURE);
 

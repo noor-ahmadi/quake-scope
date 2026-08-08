@@ -1,5 +1,7 @@
 package dev.noorahmadi.quakescope.earthquake;
 
+import java.time.Instant;
+
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -28,12 +30,41 @@ public class EarthquakeController {
                     sort = "occurredAt",
                     direction = Sort.Direction.DESC)
             Pageable pageable,
-            @RequestParam(required = false) Double minMagnitude) {
-        if (minMagnitude == null) {
-            return EarthquakePageResponse.from(repository.findAll(pageable));
+            @RequestParam(required = false) Double minMagnitude,
+            @RequestParam(required = false) Double maxMagnitude,
+            @RequestParam(required = false) Instant occurredAfter,
+            @RequestParam(required = false) Instant occurredBefore,
+            @RequestParam(required = false) Boolean tsunami,
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) String alert,
+            @RequestParam(required = false) String placeContains,
+            @RequestParam(required = false) Double minLongitude,
+            @RequestParam(required = false) Double maxLongitude,
+            @RequestParam(required = false) Double minLatitude,
+            @RequestParam(required = false) Double maxLatitude) {
+        try {
+            EarthquakeFilter filter = new EarthquakeFilter(
+                    minMagnitude,
+                    maxMagnitude,
+                    occurredAfter,
+                    occurredBefore,
+                    tsunami,
+                    status,
+                    alert,
+                    placeContains,
+                    minLongitude,
+                    maxLongitude,
+                    minLatitude,
+                    maxLatitude);
+            return EarthquakePageResponse.from(
+                    repository.findAll(filter.specification(), pageable));
         }
-        return EarthquakePageResponse.from(
-                repository.findByMagnitudeGreaterThanEqual(minMagnitude, pageable));
+        catch (IllegalArgumentException exception) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    exception.getMessage(),
+                    exception);
+        }
     }
 
     @GetMapping("/{usgsId}")

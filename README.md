@@ -69,11 +69,19 @@ HTTP response and page metadata.
 ### `GET /api/v1/earthquakes`
 
 Returns earthquakes newest-first by default. It accepts Spring-style `page`,
-`size`, and `sort` query parameters, plus an optional inclusive `minMagnitude`
-filter; page size is capped at 100.
+`size`, and `sort` parameters; page size is capped at 100. Filters are
+composable and inclusive:
+
+- `minMagnitude` and `maxMagnitude`
+- `occurredAfter` and `occurredBefore` as ISO-8601 instants
+- `tsunami`, `status`, `alert`, and case-insensitive `placeContains`
+- `minLongitude`, `maxLongitude`, `minLatitude`, and `maxLatitude`
+
+Invalid coordinate or inverted ranges return an RFC 9457 response with HTTP
+`400`.
 
 ```bash
-curl "http://localhost:8080/api/v1/earthquakes?minMagnitude=4.0"
+curl "http://localhost:8080/api/v1/earthquakes?minMagnitude=4.0&tsunami=true"
 ```
 
 ```json
