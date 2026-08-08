@@ -19,7 +19,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @Import(TestcontainersConfiguration.class)
 @AutoConfigureMockMvc
-@SpringBootTest
+@SpringBootTest(properties = "quakescope.ingestion.enabled=false")
 class EarthquakeApiIntegrationTests {
 
     private static final ClassPathResource FIXTURE =

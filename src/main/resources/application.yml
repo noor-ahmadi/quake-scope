@@ -47,3 +47,11 @@ info:
 quakescope:
   usgs:
     base-url: https://earthquake.usgs.gov
+    feed-path: /earthquakes/feed/v1.0/summary/all_hour.geojson
+    request-timeout: ${USGS_REQUEST_TIMEOUT:10s}
+    max-attempts: ${USGS_MAX_ATTEMPTS:3}
+    retry-backoff: ${USGS_RETRY_BACKOFF:500ms}
+  ingestion:
+    enabled: ${USGS_INGESTION_ENABLED:true}
+    initial-delay: ${USGS_INGESTION_INITIAL_DELAY:0s}
+    fixed-delay: ${USGS_INGESTION_INTERVAL:1m}

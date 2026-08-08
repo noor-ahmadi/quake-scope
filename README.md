@@ -3,9 +3,10 @@
 `quake-scope` is a backend-first earthquake dashboard that ingests USGS GeoJSON,
 keeps source revisions, and exposes a stable API for maps and analytics.
 
-The first vertical slice is intentionally narrow: it parses a deterministic
-USGS-shaped fixture, performs idempotent PostgreSQL upserts, and serves a
-paginated earthquake endpoint.
+It retrieves the USGS all-hour feed on a configurable schedule, retries
+transient upstream failures, performs idempotent PostgreSQL upserts, and serves
+a paginated earthquake API. A deterministic fixture profile remains available
+for local development.
 
 ## Stack
 
@@ -15,16 +16,28 @@ paginated earthquake endpoint.
 - Testcontainers and JUnit 6
 - Maven Wrapper
 
-## Run the vertical slice
+## Run with live USGS data
 
 Requirements: Java 17 and Docker.
 
 ```bash
 docker compose up -d postgres
-./mvnw spring-boot:run -Dspring-boot.run.profiles=fixture
+./mvnw spring-boot:run
 ```
 
 On Windows PowerShell, use `.\mvnw.cmd` in place of `./mvnw`.
+
+The live feed runs immediately at startup and every minute afterward. Its
+interval, timeout, and retry policy can be configured with
+`USGS_INGESTION_INTERVAL`, `USGS_REQUEST_TIMEOUT`, `USGS_MAX_ATTEMPTS`, and
+`USGS_RETRY_BACKOFF`. Set `USGS_INGESTION_ENABLED=false` to disable it.
+
+For a deterministic local dataset, start the fixture profile instead:
+
+```bash
+./mvnw spring-boot:run -Dspring-boot.run.profiles=fixture \
+  -Dspring-boot.run.arguments=--quakescope.ingestion.enabled=false
+```
 
 The `fixture` profile imports
 `src/main/resources/fixtures/usgs/sample-feed.geojson` on startup. Repeated

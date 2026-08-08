@@ -28,7 +28,15 @@ public class EarthquakeIngestionService {
 
     @Transactional
     public IngestionResult ingest(Resource resource) {
-        List<ParsedEarthquake> earthquakes = parser.parse(resource);
+        return ingest(parser.parse(resource));
+    }
+
+    @Transactional
+    public IngestionResult ingest(byte[] content) {
+        return ingest(parser.parse(content));
+    }
+
+    private IngestionResult ingest(List<ParsedEarthquake> earthquakes) {
         Instant observedAt = clock.instant();
         int inserted = 0;
         int updated = 0;

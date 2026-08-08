@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.time.Instant;
 import java.util.List;
+import java.util.Objects;
 
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
@@ -17,6 +19,11 @@ public class UsgsFeedParser {
 
     public UsgsFeedParser(JsonMapper jsonMapper) {
         this.jsonMapper = jsonMapper;
+    }
+
+    public List<ParsedEarthquake> parse(byte[] content) {
+        Objects.requireNonNull(content, "content is required");
+        return parse(new ByteArrayResource(content, "live USGS feed"));
     }
 
     public List<ParsedEarthquake> parse(Resource resource) {
