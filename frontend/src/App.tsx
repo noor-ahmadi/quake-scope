@@ -140,14 +140,24 @@ export default function App() {
 
       <main>
         <section className="hero">
-          <div>
-            <span className="hero-kicker"><i /> Earth in motion</span>
-            <h1>See seismic activity<br /><em>as it unfolds.</em></h1>
+          <div className="hero-copy">
+            <span className="hero-kicker"><i /> USGS / global seismic catalog</span>
+            <h1>The earth<br /><em>does not hold still.</em></h1>
           </div>
-          <p>
-            Explore recent earthquakes around the world with live USGS data, focused analytics,
-            and a pipeline that keeps its own history honest.
-          </p>
+          <div className="hero-aside">
+            <span className="hero-index">Field note / QS—001</span>
+            <p>
+              A live atlas of recent earthquakes, drawn from the USGS catalog and preserved in
+              Quake Scope's own queryable history.
+            </p>
+            <div className="hero-scale" aria-hidden="true">
+              <span /><span /><span /><span /><span />
+              <b>24H survey</b>
+            </div>
+          </div>
+          <div className="hero-contours" aria-hidden="true">
+            <span /><span /><span /><span />
+          </div>
         </section>
 
         <FilterBar filters={filters} onChange={handleFiltersChange} />
