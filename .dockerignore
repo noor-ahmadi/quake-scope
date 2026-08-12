@@ -3,6 +3,9 @@
 .idea
 .vscode
 target
+frontend/node_modules
+frontend/dist
+frontend/coverage
 *.iml
 README.md
 compose.yaml

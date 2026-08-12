@@ -14,6 +14,7 @@ import com.sun.net.httpserver.HttpServer;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.util.unit.DataSize;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -95,16 +96,28 @@ class UsgsFeedClientTests {
                 .contains("offset=1001");
     }
 
+    @Test
+    void acceptsCatalogResponsesLargerThanTheFrameworkDefaultBuffer() {
+        byte[] feed = new byte[300_000];
+        server.createContext("/feed", exchange -> respond(exchange, 200, feed));
+
+        UsgsFeedClient client = client(1);
+
+        assertThat(client.fetchLatest()).hasSize(feed.length);
+    }
+
     private UsgsFeedClient client(int maxAttempts) {
         URI baseUrl = URI.create("http://127.0.0.1:" + server.getAddress().getPort());
         UsgsClientProperties properties = new UsgsClientProperties(
                 baseUrl,
                 "/feed",
                 "/query",
+                DataSize.ofMegabytes(1),
                 Duration.ofSeconds(2),
                 maxAttempts,
                 Duration.ofMillis(1));
-        WebClient webClient = WebClient.builder().baseUrl(baseUrl.toString()).build();
+        WebClient webClient = new UsgsClientConfiguration()
+                .usgsWebClient(WebClient.builder(), properties);
         return new UsgsFeedClient(webClient, properties);
     }
 

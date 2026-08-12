@@ -1,3 +1,5 @@
+name: quake-scope
+
 services:
   postgres:
     image: postgres:18-alpine
@@ -14,6 +16,47 @@ services:
       retries: 10
     volumes:
       - quake-scope-postgres:/var/lib/postgresql
+    restart: unless-stopped
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      DATABASE_URL: jdbc:postgresql://postgres:5432/quake_scope
+      DATABASE_USERNAME: quake_scope
+      DATABASE_PASSWORD: quake_scope
+      USGS_INGESTION_ENABLED: ${USGS_INGESTION_ENABLED:-true}
+      USGS_CATCH_UP_ENABLED: ${USGS_CATCH_UP_ENABLED:-true}
+    ports:
+      - "${QUAKE_SCOPE_API_PORT:-8080}:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/actuator/health || exit 1"]
+      interval: 10s
+      timeout: 3s
+      start_period: 20s
+      retries: 8
+    restart: unless-stopped
+
+  web:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "${QUAKE_SCOPE_PORT:-3000}:8080"
+    depends_on:
+      api:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/healthz || exit 1"]
+      interval: 10s
+      timeout: 3s
+      start_period: 5s
+      retries: 5
+    restart: unless-stopped
 
 volumes:
   quake-scope-postgres:

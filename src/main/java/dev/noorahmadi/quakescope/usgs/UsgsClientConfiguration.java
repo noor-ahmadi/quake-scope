@@ -9,6 +9,10 @@ public class UsgsClientConfiguration {
 
     @Bean
     WebClient usgsWebClient(WebClient.Builder builder, UsgsClientProperties properties) {
-        return builder.baseUrl(properties.baseUrl().toString()).build();
+        return builder
+                .baseUrl(properties.baseUrl().toString())
+                .codecs(codecs -> codecs.defaultCodecs().maxInMemorySize(
+                        Math.toIntExact(properties.maxResponseSize().toBytes())))
+                .build();
     }
 }

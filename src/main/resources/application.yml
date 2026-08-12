@@ -49,6 +49,7 @@ quakescope:
     base-url: https://earthquake.usgs.gov
     feed-path: /earthquakes/feed/v1.0/summary/all_hour.geojson
     query-path: /fdsnws/event/1/query
+    max-response-size: ${USGS_MAX_RESPONSE_SIZE:16MB}
     request-timeout: ${USGS_REQUEST_TIMEOUT:10s}
     max-attempts: ${USGS_MAX_ATTEMPTS:3}
     retry-backoff: ${USGS_RETRY_BACKOFF:500ms}

@@ -5,12 +5,14 @@ import java.time.Duration;
 import java.util.Objects;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.util.unit.DataSize;
 
 @ConfigurationProperties("quakescope.usgs")
 public record UsgsClientProperties(
         URI baseUrl,
         String feedPath,
         String queryPath,
+        DataSize maxResponseSize,
         Duration requestTimeout,
         int maxAttempts,
         Duration retryBackoff) {
@@ -19,6 +21,7 @@ public record UsgsClientProperties(
         Objects.requireNonNull(baseUrl, "baseUrl is required");
         Objects.requireNonNull(feedPath, "feedPath is required");
         Objects.requireNonNull(queryPath, "queryPath is required");
+        Objects.requireNonNull(maxResponseSize, "maxResponseSize is required");
         Objects.requireNonNull(requestTimeout, "requestTimeout is required");
         Objects.requireNonNull(retryBackoff, "retryBackoff is required");
         if (!baseUrl.isAbsolute()) {
@@ -29,6 +32,12 @@ public record UsgsClientProperties(
         }
         if (queryPath.isBlank() || !queryPath.startsWith("/")) {
             throw new IllegalArgumentException("queryPath must start with '/'");
+        }
+        if (maxResponseSize.toBytes() <= 0) {
+            throw new IllegalArgumentException("maxResponseSize must be positive");
+        }
+        if (maxResponseSize.toBytes() > Integer.MAX_VALUE) {
+            throw new IllegalArgumentException("maxResponseSize must be smaller than 2GB");
         }
         if (requestTimeout.isZero() || requestTimeout.isNegative()) {
             throw new IllegalArgumentException("requestTimeout must be positive");
