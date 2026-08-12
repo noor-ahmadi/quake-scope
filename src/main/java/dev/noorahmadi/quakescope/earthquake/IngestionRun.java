@@ -28,6 +28,16 @@ public class IngestionRun {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 16)
+    private IngestionRunSource source;
+
+    @Column(name = "range_start")
+    private Instant rangeStart;
+
+    @Column(name = "range_end")
+    private Instant rangeEnd;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 16)
     private IngestionRunStatus status;
 
     @Column(nullable = false)
@@ -48,13 +58,29 @@ public class IngestionRun {
     protected IngestionRun() {
     }
 
-    private IngestionRun(Instant startedAt) {
+    private IngestionRun(
+            IngestionRunSource source,
+            Instant startedAt,
+            Instant rangeStart,
+            Instant rangeEnd) {
+        this.source = source;
         this.startedAt = startedAt;
+        this.rangeStart = rangeStart;
+        this.rangeEnd = rangeEnd;
         status = IngestionRunStatus.RUNNING;
     }
 
-    static IngestionRun start(Instant startedAt) {
-        return new IngestionRun(Objects.requireNonNull(startedAt, "startedAt is required"));
+    static IngestionRun start(
+            IngestionRunSource source,
+            Instant startedAt,
+            Instant rangeStart,
+            Instant rangeEnd) {
+        Objects.requireNonNull(source, "source is required");
+        Objects.requireNonNull(startedAt, "startedAt is required");
+        if (rangeStart != null && rangeEnd != null && rangeStart.isAfter(rangeEnd)) {
+            throw new IllegalArgumentException("rangeStart must not be after rangeEnd");
+        }
+        return new IngestionRun(source, startedAt, rangeStart, rangeEnd);
     }
 
     void succeed(IngestionResult result, Instant completedAt) {
@@ -92,6 +118,18 @@ public class IngestionRun {
 
     public Instant getCompletedAt() {
         return completedAt;
+    }
+
+    public IngestionRunSource getSource() {
+        return source;
+    }
+
+    public Instant getRangeStart() {
+        return rangeStart;
+    }
+
+    public Instant getRangeEnd() {
+        return rangeEnd;
     }
 
     public IngestionRunStatus getStatus() {

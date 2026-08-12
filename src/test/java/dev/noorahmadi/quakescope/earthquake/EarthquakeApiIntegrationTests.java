@@ -21,7 +21,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @Import(TestcontainersConfiguration.class)
 @AutoConfigureMockMvc
-@SpringBootTest(properties = "quakescope.ingestion.enabled=false")
+@SpringBootTest(properties = {
+        "quakescope.ingestion.enabled=false",
+        "quakescope.ingestion.catch-up.enabled=false",
+        "quakescope.retention.enabled=false"
+})
 class EarthquakeApiIntegrationTests {
 
     private static final ClassPathResource FIXTURE =
@@ -203,12 +207,21 @@ class EarthquakeApiIntegrationTests {
 
     @Test
     void returnsNewestIngestionRunsWithOutcomes() throws Exception {
-        long successfulRun = runRecorder.start(Instant.parse("2026-08-08T19:58:00Z"));
+        Instant successfulStartedAt = Instant.parse("2026-08-08T19:58:00Z");
+        long successfulRun = runRecorder.start(
+                IngestionRunSource.HISTORICAL,
+                successfulStartedAt,
+                Instant.parse("2026-08-01T00:00:00Z"),
+                Instant.parse("2026-08-08T00:00:00Z"));
         runRecorder.succeed(
                 successfulRun,
                 new IngestionResult(3, 2, 1, 0),
                 Instant.parse("2026-08-08T19:58:02Z"));
-        long failedRun = runRecorder.start(Instant.parse("2026-08-08T19:59:00Z"));
+        long failedRun = runRecorder.start(
+                IngestionRunSource.LIVE_FEED,
+                Instant.parse("2026-08-08T19:59:00Z"),
+                null,
+                null);
         runRecorder.fail(
                 failedRun,
                 new IllegalStateException("feed was unavailable"),
@@ -218,10 +231,14 @@ class EarthquakeApiIntegrationTests {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content.length()").value(2))
                 .andExpect(jsonPath("$.content[0].id").value(failedRun))
+                .andExpect(jsonPath("$.content[0].source").value("LIVE_FEED"))
                 .andExpect(jsonPath("$.content[0].status").value("FAILED"))
                 .andExpect(jsonPath("$.content[0].errorMessage")
                         .value("IllegalStateException: feed was unavailable"))
                 .andExpect(jsonPath("$.content[1].id").value(successfulRun))
+                .andExpect(jsonPath("$.content[1].source").value("HISTORICAL"))
+                .andExpect(jsonPath("$.content[1].rangeStart")
+                        .value("2026-08-01T00:00:00Z"))
                 .andExpect(jsonPath("$.content[1].status").value("SUCCEEDED"))
                 .andExpect(jsonPath("$.content[1].processed").value(3))
                 .andExpect(jsonPath("$.content[1].inserted").value(2))

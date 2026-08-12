@@ -1,5 +1,7 @@
 package dev.noorahmadi.quakescope.usgs;
 
+import java.time.Instant;
+import java.util.function.Supplier;
 import java.util.concurrent.TimeoutException;
 
 import org.slf4j.Logger;
@@ -28,12 +30,56 @@ public class UsgsFeedClient {
     }
 
     public byte[] fetchLatest() {
-        Mono<byte[]> request = webClient.get()
-                .uri(properties.feedPath())
+        return execute(
+                () -> request(properties.feedPath()),
+                "Unable to retrieve the USGS earthquake feed");
+    }
+
+    public byte[] fetchCatalogPage(
+            Instant start,
+            Instant end,
+            int limit,
+            int offset) {
+        if (start.isAfter(end)) {
+            throw new IllegalArgumentException("start must not be after end");
+        }
+        if (limit < 1 || limit > 20_000) {
+            throw new IllegalArgumentException("limit must be between 1 and 20000");
+        }
+        if (offset < 1) {
+            throw new IllegalArgumentException("offset must be at least 1");
+        }
+
+        return execute(
+                () -> webClient.get()
+                        .uri(builder -> builder
+                                .path(properties.queryPath())
+                                .queryParam("format", "geojson")
+                                .queryParam("eventtype", "earthquake")
+                                .queryParam("orderby", "time-asc")
+                                .queryParam("starttime", start)
+                                .queryParam("endtime", end)
+                                .queryParam("limit", limit)
+                                .queryParam("offset", offset)
+                                .build())
+                        .accept(GEO_JSON, MediaType.APPLICATION_JSON)
+                        .retrieve()
+                        .bodyToMono(byte[].class)
+                        .timeout(properties.requestTimeout()),
+                "Unable to retrieve the USGS earthquake catalog");
+    }
+
+    private Mono<byte[]> request(String path) {
+        return webClient.get()
+                .uri(path)
                 .accept(GEO_JSON, MediaType.APPLICATION_JSON)
                 .retrieve()
                 .bodyToMono(byte[].class)
                 .timeout(properties.requestTimeout());
+    }
+
+    private byte[] execute(Supplier<Mono<byte[]>> requestFactory, String failureMessage) {
+        Mono<byte[]> request = requestFactory.get();
 
         if (properties.maxAttempts() > 1) {
             request = request.retryWhen(Retry
@@ -54,7 +100,7 @@ public class UsgsFeedClient {
             return body;
         }
         catch (RuntimeException exception) {
-            throw new UsgsFeedClientException("Unable to retrieve the USGS earthquake feed", exception);
+            throw new UsgsFeedClientException(failureMessage, exception);
         }
     }
 

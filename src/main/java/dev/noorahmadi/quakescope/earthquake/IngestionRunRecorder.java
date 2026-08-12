@@ -18,8 +18,13 @@ public class IngestionRunRecorder {
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public long start(Instant startedAt) {
-        return repository.save(IngestionRun.start(startedAt)).getId();
+    public long start(
+            IngestionRunSource source,
+            Instant startedAt,
+            Instant rangeStart,
+            Instant rangeEnd) {
+        return repository.save(
+                IngestionRun.start(source, startedAt, rangeStart, rangeEnd)).getId();
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)

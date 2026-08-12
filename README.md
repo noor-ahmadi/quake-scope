@@ -32,6 +32,13 @@ interval, timeout, and retry policy can be configured with
 `USGS_INGESTION_INTERVAL`, `USGS_REQUEST_TIMEOUT`, `USGS_MAX_ATTEMPTS`, and
 `USGS_RETRY_BACKOFF`. Set `USGS_INGESTION_ENABLED=false` to disable it.
 
+A background catch-up imports the previous 30 days in bounded, paged requests
+after startup and once per day. `USGS_CATCH_UP_LOOKBACK`,
+`USGS_CATCH_UP_PAGE_SIZE`, and `USGS_CATCH_UP_ENABLED` control that behavior.
+Events and ingestion history are retained for 90 days by default; use
+`EVENT_RETENTION`, `INGESTION_RUN_RETENTION`, or `RETENTION_ENABLED` to adjust
+the policy.
+
 For a deterministic local dataset, start the fixture profile instead:
 
 ```bash
@@ -139,10 +146,15 @@ earthquake list.
 curl "http://localhost:8080/api/v1/ingestion-runs?size=10"
 ```
 
-## Next
+### `POST /api/v1/ingestion-runs/refresh`
 
-The next backend milestones add historical USGS catch-up ingestion and data
-retention.
+Triggers an immediate real-time feed refresh and returns the processed,
+inserted, updated, and unchanged counts. Concurrent ingestion attempts return
+HTTP `409`.
+
+```bash
+curl -X POST "http://localhost:8080/api/v1/ingestion-runs/refresh"
+```
 
 ## License
 

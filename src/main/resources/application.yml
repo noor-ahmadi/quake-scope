@@ -48,6 +48,7 @@ quakescope:
   usgs:
     base-url: https://earthquake.usgs.gov
     feed-path: /earthquakes/feed/v1.0/summary/all_hour.geojson
+    query-path: /fdsnws/event/1/query
     request-timeout: ${USGS_REQUEST_TIMEOUT:10s}
     max-attempts: ${USGS_MAX_ATTEMPTS:3}
     retry-backoff: ${USGS_RETRY_BACKOFF:500ms}
@@ -55,3 +56,15 @@ quakescope:
     enabled: ${USGS_INGESTION_ENABLED:true}
     initial-delay: ${USGS_INGESTION_INITIAL_DELAY:0s}
     fixed-delay: ${USGS_INGESTION_INTERVAL:1m}
+    catch-up:
+      enabled: ${USGS_CATCH_UP_ENABLED:true}
+      initial-delay: ${USGS_CATCH_UP_INITIAL_DELAY:15s}
+      fixed-delay: ${USGS_CATCH_UP_INTERVAL:24h}
+      lookback: ${USGS_CATCH_UP_LOOKBACK:P30D}
+      page-size: ${USGS_CATCH_UP_PAGE_SIZE:2000}
+  retention:
+    enabled: ${RETENTION_ENABLED:true}
+    initial-delay: ${RETENTION_INITIAL_DELAY:5m}
+    fixed-delay: ${RETENTION_INTERVAL:24h}
+    events: ${EVENT_RETENTION:P90D}
+    ingestion-runs: ${INGESTION_RUN_RETENTION:P90D}

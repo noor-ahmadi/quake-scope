@@ -34,6 +34,9 @@ public class LiveFeedScheduler {
                     result.updated(),
                     result.unchanged());
         }
+        catch (IngestionInProgressException exception) {
+            LOGGER.info("Skipping USGS live feed because another ingestion is in progress");
+        }
         catch (RuntimeException exception) {
             LOGGER.error("USGS ingestion failed", exception);
         }

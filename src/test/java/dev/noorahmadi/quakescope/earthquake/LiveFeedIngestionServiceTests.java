@@ -25,12 +25,17 @@ class LiveFeedIngestionServiceTests {
         UsgsFeedClient feedClient = mock(UsgsFeedClient.class);
         EarthquakeIngestionService ingestionService = mock(EarthquakeIngestionService.class);
         IngestionRunRecorder runRecorder = mock(IngestionRunRecorder.class);
-        when(runRecorder.start(NOW)).thenReturn(42L);
+        when(runRecorder.start(IngestionRunSource.LIVE_FEED, NOW, null, null)).thenReturn(42L);
         when(feedClient.fetchLatest()).thenReturn(feed);
         when(ingestionService.ingest(feed)).thenReturn(expected);
 
         LiveFeedIngestionService liveIngestion =
-                new LiveFeedIngestionService(feedClient, ingestionService, runRecorder, CLOCK);
+                new LiveFeedIngestionService(
+                        feedClient,
+                        ingestionService,
+                        runRecorder,
+                        new IngestionExecutionGuard(),
+                        CLOCK);
 
         assertThat(liveIngestion.ingestLatest()).isEqualTo(expected);
         verify(ingestionService).ingest(feed);
@@ -43,11 +48,16 @@ class LiveFeedIngestionServiceTests {
         UsgsFeedClient feedClient = mock(UsgsFeedClient.class);
         EarthquakeIngestionService ingestionService = mock(EarthquakeIngestionService.class);
         IngestionRunRecorder runRecorder = mock(IngestionRunRecorder.class);
-        when(runRecorder.start(NOW)).thenReturn(43L);
+        when(runRecorder.start(IngestionRunSource.LIVE_FEED, NOW, null, null)).thenReturn(43L);
         when(feedClient.fetchLatest()).thenThrow(failure);
 
         LiveFeedIngestionService liveIngestion =
-                new LiveFeedIngestionService(feedClient, ingestionService, runRecorder, CLOCK);
+                new LiveFeedIngestionService(
+                        feedClient,
+                        ingestionService,
+                        runRecorder,
+                        new IngestionExecutionGuard(),
+                        CLOCK);
 
         assertThatThrownBy(liveIngestion::ingestLatest).isSameAs(failure);
         verify(runRecorder).fail(43L, failure, NOW);

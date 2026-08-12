@@ -5,7 +5,9 @@ import java.net.InetSocketAddress;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.time.Instant;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
@@ -67,11 +69,38 @@ class UsgsFeedClientTests {
         assertThat(requests).hasValue(1);
     }
 
+    @Test
+    void buildsPagedCatalogQueries() {
+        byte[] feed = "{\"type\":\"FeatureCollection\",\"features\":[]}".getBytes(StandardCharsets.UTF_8);
+        AtomicReference<String> query = new AtomicReference<>();
+        server.createContext("/query", exchange -> {
+            query.set(exchange.getRequestURI().getRawQuery());
+            respond(exchange, 200, feed);
+        });
+
+        UsgsFeedClient client = client(1);
+
+        assertThat(client.fetchCatalogPage(
+                Instant.parse("2026-08-01T00:00:00Z"),
+                Instant.parse("2026-08-02T00:00:00Z"),
+                500,
+                1001)).isEqualTo(feed);
+        assertThat(query.get())
+                .contains("format=geojson")
+                .contains("eventtype=earthquake")
+                .contains("orderby=time-asc")
+                .contains("starttime=2026-08-01T00:00:00Z")
+                .contains("endtime=2026-08-02T00:00:00Z")
+                .contains("limit=500")
+                .contains("offset=1001");
+    }
+
     private UsgsFeedClient client(int maxAttempts) {
         URI baseUrl = URI.create("http://127.0.0.1:" + server.getAddress().getPort());
         UsgsClientProperties properties = new UsgsClientProperties(
                 baseUrl,
                 "/feed",
+                "/query",
                 Duration.ofSeconds(2),
                 maxAttempts,
                 Duration.ofMillis(1));
