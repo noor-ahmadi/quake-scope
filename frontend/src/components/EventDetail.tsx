@@ -22,61 +22,86 @@ export function EventDetail({ earthquake, onClose }: EventDetailProps) {
           <i />
           <ActivityIcon />
         </span>
-        <div>
-          <span className="eyebrow">Inspect an event</span>
-          <h2>Select a map marker or stream entry</h2>
-          <p>Coordinates, depth, review status, and the original USGS report will appear here.</p>
+        <div className="detail-empty-copy">
+          <span className="eyebrow">Dossier 03 / waiting for a mark</span>
+          <h2>Pick a mark from the atlas.</h2>
+          <p>
+            Select a map marker or ledger row to pin its depth, coordinates, review status,
+            and original USGS record here.
+          </p>
+          <span className="detail-empty-note">Map marker / ledger row</span>
         </div>
       </section>
     )
   }
 
+  const reportedMagnitude = formatMagnitude(earthquake.magnitude).replace(/^M\s*/, '')
+  const alertTone = earthquake.alert?.toLowerCase()
+
   return (
-    <section className="panel detail-panel" aria-label={`Details for ${earthquake.place ?? earthquake.usgsId}`}>
-      <div className="detail-header">
+    <section
+      className="panel detail-panel detail-panel--filled"
+      aria-label={`Details for ${earthquake.place ?? earthquake.usgsId}`}
+    >
+      <header className="detail-header">
         <div>
-          <span className="eyebrow">Selected event · {earthquake.usgsId}</span>
+          <div className="detail-register-line">
+            <span className="eyebrow">Dossier 03 / selected record</span>
+            <span className="detail-record-id">{earthquake.usgsId}</span>
+          </div>
           <h2>{earthquake.place ?? 'Unknown location'}</h2>
-          <p>{formatDateTime(earthquake.occurredAt)}</p>
+          <p>Observed {formatDateTime(earthquake.occurredAt)}</p>
         </div>
         <button className="icon-button" type="button" onClick={onClose} aria-label="Close event details">
           <CloseIcon />
         </button>
-      </div>
+      </header>
 
       <div className="detail-body">
         <div className={`detail-magnitude detail-magnitude--${magnitudeTone(earthquake.magnitude)}`}>
-          <span>{formatMagnitude(earthquake.magnitude)}</span>
-          <small>Magnitude</small>
+          <span className="detail-magnitude-label">Magnitude</span>
+          <strong>{reportedMagnitude}</strong>
+          <small>USGS reported</small>
         </div>
 
-        <dl className="detail-grid">
-          <div>
-            <dt>Depth</dt>
-            <dd>{earthquake.depthKm.toFixed(1)} km</dd>
+        <div className="detail-readings">
+          <div className="detail-section-label" aria-hidden="true">
+            <span>Field readings</span>
+            <b>01-04</b>
           </div>
-          <div>
-            <dt>Significance</dt>
-            <dd>{earthquake.significance}</dd>
-          </div>
-          <div>
-            <dt>Status</dt>
-            <dd><span className="soft-chip">{humanizeEnum(earthquake.status)}</span></dd>
-          </div>
-          <div>
-            <dt>Alert</dt>
-            <dd>{earthquake.alert ? <span className={`alert-chip alert-chip--${earthquake.alert}`}>{earthquake.alert}</span> : 'None'}</dd>
-          </div>
-        </dl>
 
-        <div className="coordinate-block">
-          <MapPinIcon />
-          <span>
-            <small>Epicenter</small>
-            <strong>
-              {coordinate(earthquake.latitude, 'N', 'S')} · {coordinate(earthquake.longitude, 'E', 'W')}
-            </strong>
-          </span>
+          <dl className="detail-grid">
+            <div>
+              <dt>Depth</dt>
+              <dd>{earthquake.depthKm.toFixed(1)} km</dd>
+            </div>
+            <div>
+              <dt>Significance</dt>
+              <dd>{earthquake.significance}</dd>
+            </div>
+            <div>
+              <dt>Status</dt>
+              <dd><span className="soft-chip">{humanizeEnum(earthquake.status)}</span></dd>
+            </div>
+            <div>
+              <dt>Alert</dt>
+              <dd>
+                {earthquake.alert ? (
+                  <span className={`alert-chip alert-chip--${alertTone}`}>{earthquake.alert}</span>
+                ) : 'None'}
+              </dd>
+            </div>
+          </dl>
+
+          <div className="coordinate-block">
+            <MapPinIcon />
+            <span>
+              <small>Epicenter / decimal degrees</small>
+              <strong>
+                {coordinate(earthquake.latitude, 'N', 'S')} / {coordinate(earthquake.longitude, 'E', 'W')}
+              </strong>
+            </span>
+          </div>
         </div>
 
         {earthquake.tsunami && (
@@ -89,10 +114,13 @@ export function EventDetail({ earthquake, onClose }: EventDetailProps) {
           </div>
         )}
 
-        <a className="usgs-link" href={earthquake.detailUrl} target="_blank" rel="noreferrer">
-          Open original USGS event
-          <ExternalLinkIcon />
-        </a>
+        <div className="detail-source">
+          <span>Source record / United States Geological Survey</span>
+          <a className="usgs-link" href={earthquake.detailUrl} target="_blank" rel="noreferrer">
+            Open original event
+            <ExternalLinkIcon />
+          </a>
+        </div>
       </div>
     </section>
   )
