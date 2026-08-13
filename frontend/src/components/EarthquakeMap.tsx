@@ -34,10 +34,10 @@ export function EarthquakeMap({ earthquakes, selectedId, onSelect }: EarthquakeM
     <section className="panel map-panel" aria-label="Earthquake map">
       <div className="panel-heading map-heading">
         <div>
-          <span className="eyebrow">Spatial view</span>
-          <h2>Activity map</h2>
+          <span className="eyebrow">Plate 01 / global plot</span>
+          <h2>Live atlas</h2>
         </div>
-        <span className="map-count">{earthquakes.length} plotted</span>
+        <span className="map-count"><b>{earthquakes.length}</b> events plotted</span>
       </div>
 
       <div className="map-shell">
@@ -65,11 +65,11 @@ export function EarthquakeMap({ earthquakes, selectedId, onSelect }: EarthquakeM
                 center={[earthquake.latitude, earthquake.longitude]}
                 radius={markerRadius(earthquake.magnitude) + (selected ? 3 : 0)}
                 pathOptions={{
-                  color: selected ? '#ffffff' : color,
+                  color: selected ? '#171713' : color,
                   fillColor: color,
-                  fillOpacity: selected ? 0.92 : 0.68,
-                  opacity: 0.95,
-                  weight: selected ? 3 : 1.5,
+                  fillOpacity: selected ? 1 : 0.76,
+                  opacity: 1,
+                  weight: selected ? 4 : 1.5,
                 }}
                 eventHandlers={{ click: () => onSelect(earthquake) }}
               >
@@ -96,6 +96,8 @@ export function EarthquakeMap({ earthquakes, selectedId, onSelect }: EarthquakeM
           <span><i className="legend-dot legend-dot--strong" /> 4.5–5.9</span>
           <span><i className="legend-dot legend-dot--major" /> 6.0+</span>
         </div>
+
+        <div className="map-instruction" aria-hidden="true">Drag to survey / scroll to zoom</div>
       </div>
     </section>
   )

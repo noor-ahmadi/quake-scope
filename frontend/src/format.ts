@@ -66,15 +66,15 @@ export function magnitudeTone(magnitude: number | null): 'unknown' | 'low' | 'me
 export function magnitudeColor(magnitude: number | null): string {
   switch (magnitudeTone(magnitude)) {
     case 'major':
-      return '#ff3d61'
+      return '#171713'
     case 'high':
-      return '#ff785a'
+      return '#e24b33'
     case 'medium':
-      return '#ffbd5b'
+      return '#d6b436'
     case 'low':
-      return '#51d4b0'
+      return '#1d6e73'
     default:
-      return '#94a8bd'
+      return '#817b72'
   }
 }
 
