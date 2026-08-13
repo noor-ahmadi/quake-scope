@@ -610,168 +610,173 @@ main {
 
 .summary-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 14px;
+  grid-template-columns: 1.15fr repeat(3, minmax(0, 1fr));
+  color: var(--ink);
+  background: var(--paper);
+  border: 1px solid var(--ink);
   margin-bottom: 14px;
+}
+
+.summary-register {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 34px;
+  padding: 7px 12px;
+  font-family: "IBM Plex Mono", monospace;
+  background: var(--yellow);
+  border-bottom: 1px solid var(--ink);
+}
+
+.summary-register span,
+.summary-register b {
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.summary-register i {
+  padding: 0 4px;
+  color: rgba(23, 23, 19, 0.48);
+  font-style: normal;
 }
 
 .metric-card {
   position: relative;
   display: flex;
-  gap: 15px;
-  align-items: center;
-  min-height: 126px;
-  padding: 21px;
+  min-width: 0;
+  min-height: 160px;
+  padding: 15px 18px 16px;
   overflow: hidden;
-  background: linear-gradient(145deg, rgba(16, 34, 51, 0.96), rgba(11, 25, 38, 0.96));
-  border: 1px solid var(--border);
-  border-radius: 15px;
-  box-shadow: 0 14px 35px rgba(0, 0, 0, 0.13);
+  flex-direction: column;
+  background: var(--paper);
+  border-right: 1px solid var(--ink);
 }
 
 .metric-card::after {
   position: absolute;
-  right: -45px;
-  bottom: -55px;
-  width: 130px;
-  height: 130px;
+  right: 14px;
+  bottom: 15px;
+  width: 24px;
+  height: 12px;
   content: "";
-  background: radial-gradient(circle, rgba(82, 159, 192, 0.1), transparent 68%);
-  border-radius: 50%;
+  background:
+    linear-gradient(var(--ink), var(--ink)) 0 50% / 100% 1px no-repeat,
+    repeating-linear-gradient(90deg, var(--ink) 0 1px, transparent 1px 6px);
+  opacity: 0.28;
 }
 
-.metric-card > div:not(.mini-wave):not(.metric-label-row) {
+.metric-card:last-child {
+  border-right: 0;
+}
+
+.metric-topline {
   display: flex;
-  flex-direction: column;
+  gap: 9px;
+  align-items: center;
+  font-family: "IBM Plex Mono", monospace;
 }
 
-.metric-card > div > span:first-child,
-.metric-label-row > span:first-child {
-  color: var(--muted);
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
+.metric-index,
+.metric-label {
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
+}
+
+.metric-index {
+  display: grid;
+  place-items: center;
+  width: 23px;
+  height: 23px;
+  color: var(--paper);
+  background: var(--ink);
+}
+
+.metric-label {
+  color: var(--graphite);
 }
 
 .metric-card strong {
   display: block;
-  margin: 3px 0 2px;
-  color: #fff;
-  font-size: 27px;
-  font-weight: 740;
-  line-height: 1.12;
-  letter-spacing: -0.04em;
+  margin: auto 0 1px;
+  color: inherit;
+  font-family: "Instrument Serif", Georgia, serif;
+  font-size: clamp(38px, 3.5vw, 53px);
+  font-weight: 400;
+  line-height: 0.9;
+  letter-spacing: -0.035em;
 }
 
 .metric-card small {
-  color: var(--subtle);
-  font-size: 11px;
-}
-
-.metric-card--events {
-  background:
-    linear-gradient(130deg, rgba(36, 40, 48, 0.97), rgba(24, 31, 42, 0.97)),
-    var(--surface);
-  border-color: rgba(255, 120, 90, 0.2);
-}
-
-.metric-card--events::before {
-  position: absolute;
-  inset: 0;
-  content: "";
-  background: radial-gradient(circle at 0 40%, rgba(255, 120, 90, 0.12), transparent 50%);
-}
-
-.metric-icon {
-  position: relative;
-  z-index: 1;
-  display: grid !important;
-  flex: 0 0 auto;
-  place-items: center;
-  width: 42px;
-  height: 42px;
-  color: var(--orange-bright);
-  background: rgba(255, 120, 90, 0.11);
-  border: 1px solid rgba(255, 120, 90, 0.14);
-  border-radius: 12px;
-}
-
-.metric-icon svg {
-  width: 21px;
-}
-
-.metric-icon--depth {
-  color: var(--blue);
-  background: rgba(99, 168, 255, 0.1);
-  border-color: rgba(99, 168, 255, 0.13);
-}
-
-.metric-icon--wave {
-  color: #66cddd;
-  background: rgba(102, 205, 221, 0.09);
-  border-color: rgba(102, 205, 221, 0.13);
-}
-
-.metric-label-row {
-  position: absolute;
-  top: 21px;
-  left: 21px;
-  right: 21px;
-  display: flex;
-  flex-direction: row !important;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.metric-card:has(.metric-label-row) {
   display: block;
-  padding-top: 48px;
-}
-
-.metric-chip {
-  padding: 3px 7px;
-  color: var(--orange-bright);
-  font-size: 8px;
-  font-weight: 800;
-  letter-spacing: 0.07em;
-  text-transform: uppercase;
-  background: rgba(255, 120, 90, 0.09);
-  border: 1px solid rgba(255, 120, 90, 0.17);
-  border-radius: 100px;
-}
-
-.truncate {
-  display: block;
+  min-height: 31px;
+  margin-top: 6px;
   overflow: hidden;
+  color: var(--graphite);
+  font-size: 12px;
+  line-height: 1.3;
   text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
-.mini-wave {
-  position: absolute;
-  right: 17px;
-  bottom: 16px;
-  display: flex;
-  gap: 3px;
-  align-items: center;
-  height: 32px;
-  opacity: 0.22;
-}
-
-.mini-wave i {
+.metric-note {
   display: block;
-  width: 2px;
-  height: 9px;
-  background: var(--orange);
-  border-radius: 2px;
+  padding-top: 7px;
+  margin-top: 8px;
+  overflow: hidden;
+  color: var(--graphite);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 8px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+  border-top: 1px solid rgba(23, 23, 19, 0.2);
 }
 
-.mini-wave i:nth-child(2),
-.mini-wave i:nth-child(6) { height: 17px; }
-.mini-wave i:nth-child(3),
-.mini-wave i:nth-child(5) { height: 25px; }
-.mini-wave i:nth-child(4) { height: 32px; }
+.metric-card--peak {
+  background: var(--orange);
+}
+
+.metric-card--peak .metric-label,
+.metric-card--peak small,
+.metric-card--peak .metric-note {
+  color: rgba(23, 23, 19, 0.76);
+}
+
+.metric-card--depth {
+  background: var(--paper-deep);
+}
+
+.metric-card--tsunami {
+  color: var(--paper);
+  background: #1d6e73;
+}
+
+.metric-card--tsunami .metric-index {
+  color: var(--ink);
+  background: var(--yellow);
+}
+
+.metric-card--tsunami .metric-label,
+.metric-card--tsunami small,
+.metric-card--tsunami .metric-note {
+  color: rgba(242, 235, 221, 0.8);
+}
+
+.metric-card--tsunami .metric-note {
+  border-top-color: rgba(242, 235, 221, 0.28);
+}
+
+.metric-card--tsunami::after {
+  background:
+    linear-gradient(var(--paper), var(--paper)) 0 50% / 100% 1px no-repeat,
+    repeating-linear-gradient(90deg, var(--paper) 0 1px, transparent 1px 6px);
+}
 
 .panel {
   background: linear-gradient(145deg, rgba(14, 29, 43, 0.97), rgba(9, 22, 34, 0.97));
@@ -1781,6 +1786,8 @@ footer a:hover { color: var(--text); }
   .hero-aside { width: min(620px, 100%); }
   .hero-aside p { max-width: 620px; }
   .summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .metric-card:nth-of-type(2) { border-right: 0; }
+  .metric-card:nth-of-type(-n + 2) { border-bottom: 1px solid var(--ink); }
   .primary-grid, .secondary-grid { grid-template-columns: 1fr; }
   .map-panel { height: 540px; }
   .event-panel { height: 540px; }
@@ -1806,8 +1813,9 @@ footer a:hover { color: var(--text); }
   .select-field select { max-width: none; }
   .toggle-filter { flex: 1 0 auto; order: 4; justify-content: center; }
   .clear-filters { order: 5; }
-  .summary-grid { grid-template-columns: 1fr; gap: 10px; }
-  .metric-card { min-height: 105px; }
+  .summary-register { padding-inline: 10px; }
+  .summary-register span { max-width: 70%; }
+  .metric-card { min-height: 148px; padding: 13px 14px; }
   .map-panel { height: 470px; }
   .event-panel { height: 510px; }
   .panel-heading { min-height: 69px; padding: 14px 16px; }
@@ -1837,6 +1845,11 @@ footer a:hover { color: var(--text); }
   .refresh-button { width: 39px; justify-content: center; padding: 0; }
   .brand strong { font-size: 20px; }
   .hero h1 { font-size: 48px; }
+  .summary-grid { grid-template-columns: 1fr; }
+  .metric-card,
+  .metric-card:nth-of-type(2) { min-height: 138px; border-right: 0; border-bottom: 1px solid var(--ink); }
+  .metric-card:last-child { border-bottom: 0; }
+  .metric-card strong { font-size: 44px; }
   .map-panel { height: 420px; }
   .map-legend { flex-wrap: wrap; }
   .detail-body { grid-template-columns: 1fr; }
