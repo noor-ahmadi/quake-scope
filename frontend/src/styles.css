@@ -1535,6 +1535,21 @@ main {
   gap: 14px;
 }
 
+.filter-motion-shell,
+.dashboard-sections,
+.dashboard-sections > div,
+.detail-motion-shell {
+  min-width: 0;
+}
+
+.detail-motion-shell {
+  display: grid;
+}
+
+.detail-motion-shell > .detail-panel {
+  height: 100%;
+}
+
 .detail-panel,
 .ingestion-panel {
   min-width: 0;
@@ -2582,7 +2597,6 @@ footer a:hover { color: var(--text); }
   border: 1px solid rgba(81, 212, 176, 0.25);
   border-radius: 12px;
   box-shadow: 0 20px 55px rgba(0, 0, 0, 0.42);
-  animation: toastIn 220ms ease-out;
   backdrop-filter: blur(16px);
 }
 
@@ -2596,7 +2610,6 @@ footer a:hover { color: var(--text); }
 @keyframes statusPulse { from { opacity: 0.8; transform: scale(0.7); } to { opacity: 0; transform: scale(1.5); } }
 @keyframes softPulse { 50% { opacity: 0.45; transform: scale(0.92); } }
 @keyframes loadingSlide { from { transform: translateX(-120%); } to { transform: translateX(400%); } }
-@keyframes toastIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
 
 @media (max-width: 1260px) {
   .filter-panel {
