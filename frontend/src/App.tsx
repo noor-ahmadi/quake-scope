@@ -9,6 +9,7 @@ import { EventDetail } from './components/EventDetail'
 import { EventList } from './components/EventList'
 import { FilterBar } from './components/FilterBar'
 import { IngestionPanel } from './components/IngestionPanel'
+import { SeismicTrace } from './components/SeismicTrace'
 import { SummaryCards } from './components/SummaryCards'
 import { ActivityIcon } from './components/Icons'
 import { FatalState, LoadingDashboard, ToastNotice, UpdateError } from './components/SystemStates'
@@ -203,6 +204,12 @@ export default function App() {
           <motion.div className="hero-contours" aria-hidden="true" variants={contourReveal}>
             <span /><span /><span /><span />
           </motion.div>
+          <SeismicTrace
+            earthquakes={snapshot?.earthquakes.content ?? []}
+            totalEvents={snapshot?.summary.totalEvents ?? null}
+            maximumMagnitude={snapshot?.summary.maximumMagnitude ?? null}
+            health={snapshot?.health ?? 'UNKNOWN'}
+          />
         </motion.section>
 
         <motion.div
