@@ -102,6 +102,29 @@ select:focus-visible {
   min-height: 100vh;
 }
 
+.skip-link {
+  position: fixed;
+  top: 9px;
+  left: 12px;
+  z-index: 2000;
+  padding: 10px 13px;
+  color: var(--paper);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-decoration: none;
+  text-transform: uppercase;
+  background: var(--ink);
+  border: 1px solid var(--paper);
+  transform: translateY(-150%);
+  transition: transform 160ms ease;
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
 .topbar {
   position: sticky;
   top: 0;
@@ -264,6 +287,113 @@ main {
   width: min(1540px, calc(100% - 56px));
   margin: 0 auto;
   padding: 28px 0 64px;
+}
+
+.field-index {
+  position: sticky;
+  top: 78px;
+  z-index: 900;
+  display: grid;
+  grid-template-columns: 185px minmax(0, 1fr) 180px;
+  min-height: 38px;
+  margin-bottom: 12px;
+  color: var(--paper);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 8px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: var(--ink);
+  border: 1px solid var(--paper);
+  box-shadow: 0 7px 0 rgba(23, 23, 19, 0.42);
+}
+
+.field-index__register,
+.field-index__progress {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding: 0 12px;
+  white-space: nowrap;
+}
+
+.field-index__register {
+  color: var(--muted);
+  border-right: 1px solid rgba(242, 235, 221, 0.24);
+}
+
+.field-index__register i {
+  width: 16px;
+  height: 1px;
+  background: var(--orange);
+}
+
+.field-index__links {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.field-index__links a {
+  display: flex;
+  gap: 7px;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  padding: 0 9px;
+  color: var(--muted);
+  text-decoration: none;
+  border-right: 1px solid rgba(242, 235, 221, 0.16);
+  transition: color 140ms ease, background 140ms ease;
+}
+
+.field-index__links a:hover {
+  color: var(--paper);
+  background: rgba(242, 235, 221, 0.08);
+}
+
+.field-index__links a[aria-current="location"] {
+  color: var(--ink);
+  background: var(--yellow);
+}
+
+.field-index__links b {
+  color: var(--orange-bright);
+  font-size: 7px;
+  font-weight: 500;
+}
+
+.field-index__links a[aria-current="location"] b {
+  color: var(--ink);
+}
+
+.field-index__progress {
+  flex-direction: row-reverse;
+  color: var(--subtle);
+}
+
+.field-index__progress > span {
+  display: block;
+  width: 52px;
+  height: 2px;
+  overflow: hidden;
+  background: rgba(242, 235, 221, 0.16);
+}
+
+.field-index__progress i {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: var(--orange);
+  transform: scaleX(var(--field-progress));
+  transform-origin: left;
+  transition: transform 100ms linear;
+}
+
+#cover,
+#survey,
+#readings,
+#atlas,
+#dossiers {
+  scroll-margin-top: 132px;
 }
 
 .hero {
@@ -3536,12 +3666,21 @@ footer a:hover { color: var(--text); }
   footer { width: min(100% - 34px, 900px); }
 }
 
+@media (max-width: 960px) {
+  .field-index { grid-template-columns: minmax(0, 1fr); }
+  .field-index__register,
+  .field-index__progress { display: none; }
+  .field-index__links a:last-child { border-right: 0; }
+}
+
 @media (max-width: 740px) {
   .topbar { min-height: 68px; padding: 10px 17px; }
   .brand small, .system-status { display: none; }
   .brand-mark { width: 39px; height: 39px; }
   .refresh-button { min-height: 39px; padding: 0 12px; }
   main { width: calc(100% - 24px); padding: 26px 0 42px; }
+  .field-index { top: 68px; min-height: 34px; }
+  .field-index__links a { padding-inline: 5px; font-size: 7px; }
   .hero { padding: 30px 24px 110px; }
   .hero h1 { font-size: clamp(52px, 15vw, 76px); line-height: 0.82; }
   .hero-aside p { font-size: 14px; line-height: 1.55; }
@@ -3621,6 +3760,7 @@ footer a:hover { color: var(--text); }
   .refresh-button span { display: none; }
   .refresh-button { width: 39px; justify-content: center; padding: 0; }
   .brand strong { font-size: 20px; }
+  .field-index__links a { gap: 4px; padding-inline: 2px; letter-spacing: 0.04em; }
   .hero h1 { font-size: 48px; }
   .filter-register { gap: 10px; font-size: 7px; }
   .filter-register > span:last-child { text-align: right; }

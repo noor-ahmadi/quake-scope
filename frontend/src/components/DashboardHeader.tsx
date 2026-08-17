@@ -24,14 +24,25 @@ export function DashboardHeader({ health, loadedAt, refreshing, onRefresh }: Das
       </a>
 
       <div className="header-actions">
-        <div className={`system-status system-status--${health.toLowerCase()}`}>
+        <div
+          className={`system-status system-status--${health.toLowerCase()}`}
+          role="status"
+          aria-live="polite"
+          aria-atomic="true"
+        >
           <span className="status-dot" />
           <span>
             <strong>{statusLabel}</strong>
             <small>{loadedAt ? `Updated ${formatRelativeTime(loadedAt)}` : 'Waiting for data'}</small>
           </span>
         </div>
-        <button className="refresh-button" type="button" onClick={onRefresh} disabled={refreshing}>
+        <button
+          className="refresh-button"
+          type="button"
+          onClick={onRefresh}
+          disabled={refreshing}
+          aria-busy={refreshing}
+        >
           <RefreshIcon className={refreshing ? 'is-spinning' : ''} />
           <span>{refreshing ? 'Syncing…' : 'Sync now'}</span>
         </button>

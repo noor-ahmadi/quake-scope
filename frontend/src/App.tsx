@@ -7,6 +7,7 @@ import { AtlasLoading } from './components/AtlasLoading'
 import { DashboardHeader } from './components/DashboardHeader'
 import { EventDetail } from './components/EventDetail'
 import { EventList } from './components/EventList'
+import { FieldIndex } from './components/FieldIndex'
 import { FilterBar } from './components/FilterBar'
 import { IngestionPanel } from './components/IngestionPanel'
 import { SeismicTrace } from './components/SeismicTrace'
@@ -172,6 +173,7 @@ export default function App() {
 
   return (
     <div className="app-shell" id="top">
+      <a className="skip-link" href="#main-content">Skip to earthquake dashboard</a>
       <DashboardHeader
         health={snapshot?.health ?? 'UNKNOWN'}
         loadedAt={snapshot?.loadedAt ?? null}
@@ -179,8 +181,10 @@ export default function App() {
         onRefresh={handleManualRefresh}
       />
 
-      <main>
+      <main id="main-content" aria-busy={loading}>
+        <FieldIndex />
         <motion.section
+          id="cover"
           className="hero"
           variants={heroSequence}
           initial="hidden"
@@ -213,6 +217,7 @@ export default function App() {
         </motion.section>
 
         <motion.div
+          id="survey"
           className="filter-motion-shell"
           initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
@@ -243,11 +248,11 @@ export default function App() {
             initial="hidden"
             animate="visible"
           >
-            <motion.div variants={dashboardReveal}>
+            <motion.div id="readings" variants={dashboardReveal}>
               <SummaryCards summary={snapshot.summary} />
             </motion.div>
 
-            <motion.div variants={dashboardReveal}>
+            <motion.div id="atlas" variants={dashboardReveal}>
               <div className="primary-grid">
                 <Suspense
                   fallback={<AtlasLoading eventCount={snapshot.earthquakes.content.length} />}
@@ -267,7 +272,7 @@ export default function App() {
               </div>
             </motion.div>
 
-            <motion.div variants={dashboardReveal}>
+            <motion.div id="dossiers" variants={dashboardReveal}>
               <div className="secondary-grid">
                 <AnimatePresence initial={false} mode="wait">
                   <motion.div
