@@ -1,10 +1,10 @@
-import { useEffect, useMemo, useState } from 'react'
+import { lazy, Suspense, useEffect, useMemo, useState } from 'react'
 import { AnimatePresence, motion, type Variants } from 'motion/react'
 import { ApiError, fetchDashboard, refreshFeed } from './api'
 import type { DashboardSnapshot, Earthquake, EarthquakeFilters } from './types'
 import { DEFAULT_FILTERS } from './types'
+import { AtlasLoading } from './components/AtlasLoading'
 import { DashboardHeader } from './components/DashboardHeader'
-import { EarthquakeMap } from './components/EarthquakeMap'
 import { EventDetail } from './components/EventDetail'
 import { EventList } from './components/EventList'
 import { FilterBar } from './components/FilterBar'
@@ -12,6 +12,11 @@ import { IngestionPanel } from './components/IngestionPanel'
 import { SummaryCards } from './components/SummaryCards'
 import { ActivityIcon } from './components/Icons'
 import { FatalState, LoadingDashboard, ToastNotice, UpdateError } from './components/SystemStates'
+
+const EarthquakeMap = lazy(async () => {
+  const module = await import('./components/EarthquakeMap')
+  return { default: module.EarthquakeMap }
+})
 
 interface ToastMessage {
   tone: 'success' | 'error'
@@ -237,11 +242,15 @@ export default function App() {
 
             <motion.div variants={dashboardReveal}>
               <div className="primary-grid">
-                <EarthquakeMap
-                  earthquakes={snapshot.earthquakes.content}
-                  selectedId={selectedId}
-                  onSelect={selectEarthquake}
-                />
+                <Suspense
+                  fallback={<AtlasLoading eventCount={snapshot.earthquakes.content.length} />}
+                >
+                  <EarthquakeMap
+                    earthquakes={snapshot.earthquakes.content}
+                    selectedId={selectedId}
+                    onSelect={selectEarthquake}
+                  />
+                </Suspense>
                 <EventList
                   earthquakes={snapshot.earthquakes.content}
                   total={snapshot.earthquakes.page.totalElements}
