@@ -10,7 +10,8 @@ import { EventList } from './components/EventList'
 import { FilterBar } from './components/FilterBar'
 import { IngestionPanel } from './components/IngestionPanel'
 import { SummaryCards } from './components/SummaryCards'
-import { ActivityIcon, AlertIcon, CheckIcon, RefreshIcon } from './components/Icons'
+import { ActivityIcon } from './components/Icons'
+import { FatalState, LoadingDashboard, ToastNotice, UpdateError } from './components/SystemStates'
 
 interface ToastMessage {
   tone: 'success' | 'error'
@@ -72,26 +73,6 @@ function useDebouncedValue<T>(value: T, delay: number): T {
   }, [delay, value])
 
   return debounced
-}
-
-function LoadingDashboard() {
-  return (
-    <motion.div
-      className="loading-dashboard"
-      aria-label="Loading earthquake data"
-      role="status"
-      initial={{ opacity: 0, y: 14 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.45, ease: editorialEase }}
-    >
-      <div className="loading-orbit">
-        <span />
-        <ActivityIcon />
-      </div>
-      <strong>Reading the latest seismic activity</strong>
-      <span>Connecting to Quake Scope…</span>
-    </motion.div>
-  )
 }
 
 export default function App() {
@@ -231,36 +212,16 @@ export default function App() {
         {loading && snapshot && <div className="loading-line" aria-label="Updating results"><span /></div>}
 
         {error && snapshot && (
-          <motion.div
-            className="error-banner"
-            role="alert"
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.36, ease: editorialEase }}
-          >
-            <AlertIcon />
-            <span><strong>Update interrupted</strong>{error}</span>
-            <button type="button" onClick={() => setReloadToken((value) => value + 1)}>Try again</button>
-          </motion.div>
+          <UpdateError message={error} onRetry={() => setReloadToken((value) => value + 1)} />
         )}
 
         {!snapshot && loading && <LoadingDashboard />}
 
         {!snapshot && !loading && (
-          <motion.div
-            className="fatal-state"
-            role="alert"
-            initial={{ opacity: 0, y: 18 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, ease: editorialEase }}
-          >
-            <span><AlertIcon /></span>
-            <h2>Quake Scope could not reach its data service</h2>
-            <p>{error ?? 'Check the API and database, then try again.'}</p>
-            <button type="button" onClick={() => setReloadToken((value) => value + 1)}>
-              <RefreshIcon /> Retry connection
-            </button>
-          </motion.div>
+          <FatalState
+            message={error ?? 'Check the API and database, then try again.'}
+            onRetry={() => setReloadToken((value) => value + 1)}
+          />
         )}
 
         {snapshot && (
@@ -319,18 +280,7 @@ export default function App() {
 
       <AnimatePresence>
         {toast && (
-          <motion.div
-            className={`toast toast--${toast.tone}`}
-            role="status"
-            initial={{ opacity: 0, y: 18, rotate: -0.5 }}
-            animate={{ opacity: 1, y: 0, rotate: 0 }}
-            exit={{ opacity: 0, y: 10, scale: 0.98 }}
-            transition={{ duration: 0.3, ease: editorialEase }}
-          >
-            {toast.tone === 'success' ? <CheckIcon /> : <AlertIcon />}
-            <span>{toast.text}</span>
-            <button type="button" onClick={() => setToast(null)} aria-label="Dismiss notification">×</button>
-          </motion.div>
+          <ToastNotice tone={toast.tone} text={toast.text} onDismiss={() => setToast(null)} />
         )}
       </AnimatePresence>
     </div>
