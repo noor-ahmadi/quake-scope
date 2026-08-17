@@ -921,7 +921,7 @@ main {
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
 }
 
-.quake-map .leaflet-tooltip::before {
+.quake-map .leaflet-tooltip-top::before {
   border-top-color: rgba(8, 20, 31, 0.96);
 }
 
@@ -1325,9 +1325,13 @@ main {
   box-shadow: 5px 5px 0 rgba(23, 23, 19, 0.22);
 }
 
-.quake-map .leaflet-tooltip::before {
+.quake-map .leaflet-tooltip-top::before {
   border-top-color: var(--ink);
 }
+
+.quake-map .leaflet-tooltip-bottom::before { border-bottom-color: var(--ink); }
+.quake-map .leaflet-tooltip-left::before { border-left-color: var(--ink); }
+.quake-map .leaflet-tooltip-right::before { border-right-color: var(--ink); }
 
 .quake-map .leaflet-tooltip strong {
   color: var(--orange);
@@ -1344,6 +1348,186 @@ main {
   color: var(--graphite);
   font-family: "IBM Plex Mono", monospace;
   font-size: 8px;
+}
+
+.atlas-marker-host {
+  overflow: visible !important;
+  background: transparent;
+  border: 0;
+}
+
+.atlas-marker {
+  --marker-color: var(--graphite);
+  --atlas-marker-size: 20px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: grid;
+  width: var(--atlas-marker-size);
+  height: var(--atlas-marker-size);
+  place-items: center;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+}
+
+.atlas-marker::before,
+.atlas-marker::after {
+  position: absolute;
+  z-index: 0;
+  content: "";
+  background: var(--ink);
+  opacity: 0.65;
+}
+
+.atlas-marker::before {
+  right: -5px;
+  left: -5px;
+  height: 1px;
+}
+
+.atlas-marker::after {
+  top: -5px;
+  bottom: -5px;
+  width: 1px;
+}
+
+.atlas-marker__ring,
+.atlas-marker__pulse,
+.atlas-marker__core {
+  position: absolute;
+  display: block;
+}
+
+.atlas-marker__ring {
+  inset: 1px;
+  z-index: 1;
+  background: var(--marker-color);
+  border: 1px solid var(--ink);
+  border-radius: 50%;
+  opacity: 0.62;
+  transition: opacity 150ms ease, transform 150ms ease;
+}
+
+.atlas-marker__ring::after {
+  position: absolute;
+  inset: 24%;
+  content: "";
+  border: 1px solid var(--ink);
+  border-radius: 50%;
+}
+
+.atlas-marker__core {
+  z-index: 3;
+  width: 32%;
+  height: 32%;
+  background: var(--marker-color);
+  border: 1px solid var(--ink);
+  box-shadow: 1.5px 1.5px 0 var(--ink);
+  transform: rotate(45deg);
+}
+
+.atlas-marker__pulse {
+  inset: -5px;
+  z-index: 0;
+  display: none;
+  border: 2px solid var(--orange);
+  border-radius: 50%;
+}
+
+.atlas-marker-host--low .atlas-marker { --marker-color: #1d6e73; }
+.atlas-marker-host--medium .atlas-marker { --marker-color: var(--yellow); }
+.atlas-marker-host--high .atlas-marker { --marker-color: var(--orange); }
+.atlas-marker-host--major .atlas-marker { --marker-color: var(--ink); }
+
+.atlas-marker-host:hover .atlas-marker__ring,
+.atlas-marker-host:focus .atlas-marker__ring {
+  opacity: 0.94;
+  transform: scale(1.12);
+}
+
+.atlas-marker-host.is-selected .atlas-marker__ring {
+  border-width: 2px;
+  opacity: 1;
+  box-shadow: 0 0 0 2px var(--paper), 0 0 0 4px var(--ink);
+}
+
+.atlas-marker-host.is-selected .atlas-marker__pulse {
+  display: block;
+  animation: atlasMarkerPulse 1.8s ease-out infinite;
+}
+
+.atlas-marker-host.is-selected .atlas-marker__core {
+  background: var(--paper);
+  box-shadow: 2px 2px 0 var(--orange);
+}
+
+.atlas-marker__label {
+  position: absolute;
+  top: 50%;
+  left: calc(100% + 7px);
+  z-index: 5;
+  padding: 3px 5px;
+  color: var(--paper);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 7px;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  background: var(--ink);
+  border: 1px solid var(--paper);
+  box-shadow: 2px 2px 0 var(--orange);
+  transform: translateY(-50%);
+}
+
+.quake-map .atlas-tooltip {
+  min-width: 190px;
+  padding: 0 10px 9px;
+}
+
+.quake-map .atlas-tooltip .atlas-tooltip__register {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0 -10px 8px;
+  padding: 5px 7px;
+  background: var(--paper-deep);
+  border-bottom: 1px solid var(--ink);
+}
+
+.quake-map .atlas-tooltip .atlas-tooltip__register small,
+.quake-map .atlas-tooltip .atlas-tooltip__register b {
+  color: var(--graphite);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 7px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.quake-map .atlas-tooltip .atlas-tooltip__register b {
+  padding: 2px 4px;
+  color: var(--paper);
+  background: var(--ink);
+}
+
+.quake-map .atlas-tooltip > strong {
+  display: block;
+  margin-bottom: 1px;
+}
+
+.quake-map .atlas-tooltip > span:not(.atlas-tooltip__register) {
+  display: block;
+  max-width: 210px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.quake-map .atlas-tooltip > small {
+  display: block;
+  margin-top: 3px;
+  white-space: nowrap;
 }
 
 .map-legend {
@@ -1377,8 +1561,8 @@ main {
 
 .map-instruction {
   position: absolute;
-  top: 13px;
-  right: 13px;
+  bottom: 18px;
+  left: 14px;
   z-index: 500;
   padding: 6px 8px;
   color: var(--ink);
@@ -2913,6 +3097,10 @@ footer a:hover { color: var(--text); }
 @keyframes statusPulse { from { opacity: 0.8; transform: scale(0.7); } to { opacity: 0; transform: scale(1.5); } }
 @keyframes softPulse { 50% { opacity: 0.45; transform: scale(0.92); } }
 @keyframes loadingSlide { from { transform: translateX(-120%); } to { transform: translateX(400%); } }
+@keyframes atlasMarkerPulse {
+  0% { opacity: 0.75; transform: scale(0.8); }
+  75%, 100% { opacity: 0; transform: scale(1.5); }
+}
 
 @media (max-width: 1260px) {
   .filter-panel {

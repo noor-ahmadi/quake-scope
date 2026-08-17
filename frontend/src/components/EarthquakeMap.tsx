@@ -1,8 +1,9 @@
-import { useEffect } from 'react'
-import { CircleMarker, MapContainer, TileLayer, Tooltip, useMap } from 'react-leaflet'
+import { useEffect, useMemo } from 'react'
+import { MapContainer, Marker, TileLayer, Tooltip, useMap } from 'react-leaflet'
 import { latLngBounds } from 'leaflet'
 import type { Earthquake } from '../types'
-import { formatMagnitude, formatRelativeTime, magnitudeColor, markerRadius } from '../format'
+import { formatMagnitude, formatRelativeTime, magnitudeTone } from '../format'
+import { createAtlasMarkerIcon } from './atlasMarker'
 
 interface EarthquakeMapProps {
   earthquakes: Earthquake[]
@@ -29,6 +30,51 @@ function MapViewport({ earthquakes }: { earthquakes: Earthquake[] }) {
   return null
 }
 
+interface AtlasObservationProps {
+  earthquake: Earthquake
+  index: number
+  selected: boolean
+  onSelect: (earthquake: Earthquake) => void
+}
+
+function AtlasObservation({ earthquake, index, selected, onSelect }: AtlasObservationProps) {
+  const icon = useMemo(
+    () => createAtlasMarkerIcon(earthquake.magnitude, selected),
+    [earthquake.magnitude, selected],
+  )
+  const tone = magnitudeTone(earthquake.magnitude)
+  const magnitudeLabel = formatMagnitude(earthquake.magnitude)
+
+  return (
+    <Marker
+      position={[earthquake.latitude, earthquake.longitude]}
+      icon={icon}
+      title={`${magnitudeLabel} — ${earthquake.place ?? 'Unknown location'}`}
+      zIndexOffset={selected ? 1000 : 0}
+      riseOnHover
+      eventHandlers={{ click: () => onSelect(earthquake) }}
+    >
+      <Tooltip
+        key={selected ? 'locked' : 'hover'}
+        className="atlas-tooltip"
+        direction="auto"
+        opacity={1}
+        permanent={selected}
+      >
+        <span className="atlas-tooltip__register">
+          <small>Observation {String(index + 1).padStart(2, '0')}</small>
+          <b>{tone}</b>
+        </span>
+        <strong>{magnitudeLabel}</strong>
+        <span>{earthquake.place ?? 'Unknown location'}</span>
+        <small>
+          {formatRelativeTime(earthquake.occurredAt)} / depth {earthquake.depthKm.toFixed(1)} km
+        </small>
+      </Tooltip>
+    </Marker>
+  )
+}
+
 export function EarthquakeMap({ earthquakes, selectedId, onSelect }: EarthquakeMapProps) {
   return (
     <section className="panel map-panel" aria-label="Earthquake map">
@@ -45,7 +91,7 @@ export function EarthquakeMap({ earthquakes, selectedId, onSelect }: EarthquakeM
           className="quake-map"
           center={[20, 0]}
           zoom={2}
-          minZoom={2}
+          minZoom={0}
           maxZoom={12}
           scrollWheelZoom
           worldCopyJump
@@ -56,31 +102,15 @@ export function EarthquakeMap({ earthquakes, selectedId, onSelect }: EarthquakeM
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
           <MapViewport earthquakes={earthquakes} />
-          {earthquakes.map((earthquake) => {
-            const color = magnitudeColor(earthquake.magnitude)
-            const selected = earthquake.usgsId === selectedId
-            return (
-              <CircleMarker
-                key={earthquake.usgsId}
-                center={[earthquake.latitude, earthquake.longitude]}
-                radius={markerRadius(earthquake.magnitude) + (selected ? 3 : 0)}
-                pathOptions={{
-                  color: selected ? '#171713' : color,
-                  fillColor: color,
-                  fillOpacity: selected ? 1 : 0.76,
-                  opacity: 1,
-                  weight: selected ? 4 : 1.5,
-                }}
-                eventHandlers={{ click: () => onSelect(earthquake) }}
-              >
-                <Tooltip direction="top" offset={[0, -8]} opacity={1}>
-                  <strong>{formatMagnitude(earthquake.magnitude)}</strong>
-                  <span>{earthquake.place ?? 'Unknown location'}</span>
-                  <small>{formatRelativeTime(earthquake.occurredAt)}</small>
-                </Tooltip>
-              </CircleMarker>
-            )
-          })}
+          {earthquakes.map((earthquake, index) => (
+            <AtlasObservation
+              key={earthquake.usgsId}
+              earthquake={earthquake}
+              index={index}
+              selected={earthquake.usgsId === selectedId}
+              onSelect={onSelect}
+            />
+          ))}
         </MapContainer>
 
         {earthquakes.length === 0 && (
