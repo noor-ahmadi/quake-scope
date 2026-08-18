@@ -7,8 +7,10 @@ COPY package.json pnpm-lock.yaml ./
 RUN pnpm install --frozen-lockfile
 
 COPY index.html tsconfig.json tsconfig.app.json tsconfig.node.json vite.config.ts ./
+COPY public/ public/
 COPY src/ src/
 RUN pnpm run build
+RUN test -f dist/quake-mark.svg
 
 FROM nginx:1.29-alpine
 
