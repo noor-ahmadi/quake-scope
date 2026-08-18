@@ -10,6 +10,19 @@ passing through the latest upstream response.
 
 Requirements: Docker with Compose.
 
+The checked-in defaults work as-is. To keep your own ports or database
+credentials outside Git, copy the environment template first:
+
+```bash
+cp .env.example .env
+```
+
+In PowerShell, use `Copy-Item .env.example .env`.
+
+Database credentials are applied when PostgreSQL creates a new volume. If a
+volume already exists, keep its current credentials or intentionally recreate
+it before changing them.
+
 ```bash
 docker compose up --build
 ```
@@ -32,11 +45,12 @@ the stored earthquake history.
 Ports can be changed without editing Compose:
 
 ```bash
-QUAKE_SCOPE_PORT=4000 QUAKE_SCOPE_API_PORT=9090 docker compose up --build
+QUAKE_SCOPE_PORT=4000 QUAKE_SCOPE_API_PORT=9090 POSTGRES_PORT=5544 docker compose up --build
 ```
 
 In PowerShell, set `$env:QUAKE_SCOPE_PORT` and
-`$env:QUAKE_SCOPE_API_PORT` before running the Compose command.
+`$env:QUAKE_SCOPE_API_PORT` (and `$env:POSTGRES_PORT` when needed) before
+running the Compose command.
 
 ## What is included
 
@@ -108,6 +122,15 @@ variables:
 
 | Variable | Default | Purpose |
 | --- | --- | --- |
+| `QUAKE_SCOPE_PORT` | `3000` | Published dashboard port |
+| `QUAKE_SCOPE_API_PORT` | `8080` | Published API port |
+| `POSTGRES_PORT` | `5432` | Published PostgreSQL port |
+| `QUAKE_SCOPE_BIND_ADDRESS` | `0.0.0.0` | Dashboard bind address |
+| `QUAKE_SCOPE_API_BIND_ADDRESS` | `127.0.0.1` | Direct API bind address |
+| `POSTGRES_BIND_ADDRESS` | `127.0.0.1` | PostgreSQL bind address |
+| `POSTGRES_DB` | `quake_scope` | PostgreSQL database name |
+| `POSTGRES_USER` | `quake_scope` | PostgreSQL and API database user |
+| `POSTGRES_PASSWORD` | `quake_scope` | Local default; override it in `.env` outside Git |
 | `USGS_INGESTION_ENABLED` | `true` | Enable the one-minute live-feed poll |
 | `USGS_INGESTION_INTERVAL` | `1m` | Delay between live-feed polls |
 | `USGS_CATCH_UP_ENABLED` | `true` | Enable historical catalog catch-up |
