@@ -33,4 +33,21 @@ describe('SeismicTrace', () => {
       'Seismic trace, live signal. 1,234 catalog marks. Peak M 6.2.',
     )
   })
+
+  it('keeps the complete trace visible while its opacity settles', () => {
+    const { container } = render(
+      <SeismicTrace
+        earthquakes={earthquakes}
+        totalEvents={1234}
+        maximumMagnitude={6.2}
+        health="UP"
+      />,
+    )
+
+    const trace = container.querySelector('.hero-trace__line')
+
+    expect(trace).not.toHaveAttribute('pathLength')
+    expect(trace).not.toHaveAttribute('stroke-dasharray')
+    expect(trace?.getAttribute('d')).toMatch(/L 960 32$/)
+  })
 })

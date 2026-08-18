@@ -74,9 +74,9 @@ export function SeismicTrace({
             key={traceKey}
             className="hero-trace__line"
             d={tracePath}
-            initial={{ pathLength: 0, opacity: 0.35 }}
-            animate={{ pathLength: 1, opacity: 1 }}
-            transition={{ duration: 1.35, ease: [0.22, 1, 0.36, 1] }}
+            initial={{ opacity: 0.55 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.45, ease: 'easeOut' }}
           />
         </svg>
         <i className="hero-trace__scan" />

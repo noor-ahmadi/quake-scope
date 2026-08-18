@@ -21,8 +21,8 @@ describe('earthquake formatting', () => {
   })
 
   it('maps magnitude to bounded marker styling', () => {
-    expect(magnitudeColor(6.2)).toBe('#171713')
-    expect(magnitudeColor(2.1)).toBe('#1d6e73')
+    expect(magnitudeColor(6.2)).toBe('#622b14')
+    expect(magnitudeColor(2.1)).toBe('#4f5848')
     expect(markerRadius(100)).toBe(22)
     expect(markerRadius(-3)).toBe(5)
   })
