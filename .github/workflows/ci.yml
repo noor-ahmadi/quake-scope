@@ -60,6 +60,23 @@ jobs:
       - name: Build
         run: pnpm run build
 
+  containers:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v5
+
+      - name: Validate Compose file
+        run: docker compose config --quiet
+
+      - name: Build API image
+        run: docker build --tag quake-scope-api:ci .
+
+      - name: Build web image
+        run: docker build --tag quake-scope-web:ci ./frontend
+
   secret-scan:
     runs-on: ubuntu-latest
 
